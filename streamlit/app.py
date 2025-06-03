@@ -22,31 +22,18 @@ st.markdown("輸入你想分析嘅股票代號同問題，我會提供專業技�
 
 # 設置環境變數
 os.environ["TIINGO_API_KEY"] = st.secrets.get("api_keys", {}).get("TIINGO_API_KEY", "2146105fde5488455a958c98755941aafb9d9c66")
-os.environ["GOOGLE_API_KEY"] = st.secrets.get("api_keys", {}).get("GOOGLE_API_KEY", "")
 
-# 添加 ADK agent 路徑
-REPO_ROOT = Path(__file__).parent.parent.absolute()
-sys.path.append(str(REPO_ROOT))
-
-# 嘗試導入 ADK agent
+# 載入簡化版 MCP 工具
 try:
-    from tool_agent import root_agent
-    HAS_ADK = True
-    st.sidebar.success("✅ 已成功加載 ADK agent")
-except ImportError as e:
-    HAS_ADK = False
-    st.sidebar.error(f"❌ 無法加載 ADK agent: {str(e)}")
-    # 在 Streamlit Cloud 上，導入可能會失敗，這時候使用簡化版工具
-    st.sidebar.info("將使用簡化版股票分析工具")
+    from mcp_tools.stock_tools import (
+        get_stock_price,
+        get_technical_indicators,
+        get_momentum_analysis,
+        get_volume_analysis,
+        list_available_indicators
+    )
+except ImportError:
     try:
-        from mcp_tools.stock_tools import (
-            get_stock_price,
-            get_technical_indicators,
-            get_momentum_analysis,
-            get_volume_analysis,
-            list_available_indicators
-        )
-    except ImportError:
         from streamlit.mcp_tools.stock_tools import (
             get_stock_price,
             get_technical_indicators,
@@ -54,27 +41,13 @@ except ImportError as e:
             get_volume_analysis,
             list_available_indicators
         )
+    except ImportError:
+        st.error("無法載入股票分析工具。請確認 mcp_tools 目錄存在。")
+        st.stop()
 
 # 定義處理用戶請求的函數
 def process_user_query(query):
     """處理用戶查詢並生成回應"""
-    if HAS_ADK and os.environ.get("GOOGLE_API_KEY"):
-        try:
-            # 使用 ADK agent 處理查詢
-            st.sidebar.info("🔄 使用 Google ADK (Gemini) 處理請求...")
-            response = root_agent.run(query)
-            return response
-        except Exception as e:
-            st.sidebar.error(f"❌ ADK agent 處理失敗: {str(e)}")
-            st.sidebar.info("⚠️ 切換到簡化版股票分析工具")
-            return process_with_simplified_tools(query)
-    else:
-        # 使用簡化版工具處理查詢
-        st.sidebar.info("🔄 使用簡化版股票分析工具處理請求...")
-        return process_with_simplified_tools(query)
-
-def process_with_simplified_tools(query):
-    """使用簡化版工具處理查詢"""
     try:
         query_lower = query.lower()
         
@@ -371,12 +344,5 @@ if prompt := st.chat_input("輸入你嘅問題，例如：「分析 AAPL 嘅技�
 st.markdown("---")
 st.markdown("數據來源: Tiingo API | 免責聲明: 本工具僅供參考，不構成投資建議。")
 
-# 顯示模型信息
-if HAS_ADK and os.environ.get("GOOGLE_API_KEY"):
-    st.sidebar.info("✅ 使用 Google ADK (Gemini) 處理請求")
-else:
-    st.sidebar.warning("⚠️ 使用簡化版股票分析工具 (無 LLM)")
-    if not os.environ.get("GOOGLE_API_KEY"):
-        st.sidebar.error("❌ 未設置 GOOGLE_API_KEY")
-    if not HAS_ADK:
-        st.sidebar.error("❌ 無法加載 ADK agent")
+# 顯示資訊
+st.sidebar.info("⚠️ 使用簡化版股票分析工具 (無 LLM)")
