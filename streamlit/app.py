@@ -20,8 +20,10 @@ try:
 except ImportError:
     # 嘗試其他可能的導入路徑
     try:
-        from google.adk import Agent, Runner, Tool
+        from google.adk import Agent, Runner
         from google.adk.models.lite_llm import LiteLlm
+        # 移除從 google.adk 頂層導入 Tool 的嘗試
+        # from google.adk import Tool
     except ImportError as e:
         st.error(f"無法導入 Google ADK 模組: {e}")
         st.stop()
