@@ -8,6 +8,7 @@ import plotly.graph_objects as go
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
+import re # 導入 re 模組
 
 # 頁面設定
 st.set_page_config(
@@ -51,41 +52,39 @@ def process_user_query(query):
     try:
         query_lower = query.lower()
         
-        # 提取股票代碼 (簡單版本)
+        # 提取股票代碼 (使用正則表達式)
         ticker = None
-        for word in query_lower.split():
-            # 更嚴格地匹配股票代碼格式 (全大寫字母或包含字母數字且長度 <= 5)
-            if (word.isalpha() and word.isupper() and len(word) <= 5) or \
-               (word.isalnum() and len(word) <= 5 and any(c.isalpha() for c in word)):
-                ticker = word.upper()
-                break
-                
+        # 匹配 1 到 5 個大寫字母或數字的組合
+        match = re.search(r'[A-Z0-9]{1,5}', query.upper())
+        if match:
+            ticker = match.group(0)
+
         # 如果沒找到，嘗試通過常見公司名稱
         if not ticker:
             common_names = {
-                "apple": "AAPL", 
+                "apple": "AAPL",
                 "蘋果": "AAPL",
-                "microsoft": "MSFT", 
+                "microsoft": "MSFT",
                 "微軟": "MSFT",
-                "google": "GOOGL", 
+                "google": "GOOGL",
                 "谷歌": "GOOGL",
-                "amazon": "AMZN", 
+                "amazon": "AMZN",
                 "亞馬遜": "AMZN",
-                "tesla": "TSLA", 
+                "tesla": "TSLA",
                 "特斯拉": "TSLA",
-                "facebook": "META", 
+                "facebook": "META",
                 "臉書": "META",
-                "nvidia": "NVDA", 
+                "nvidia": "NVDA",
                 "輝達": "NVDA"
             }
-            
+
             for name, symbol in common_names.items():
                 if name in query_lower:
                     ticker = symbol
                     break
-        
+
         if not ticker:
-            return "請提供股票代碼或公司名稱，例如 AAPL 或 蘋果。"
+            return "請提供有效的股票代碼或公司名稱，例如 AAPL 或 蘋果。"
             
         # 決定分析類型
         if "股價" in query_lower or "價格" in query_lower or "price" in query_lower:
