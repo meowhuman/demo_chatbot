@@ -1,6 +1,6 @@
 """
-真正嘅 MCP 股票分析工具 - 修復版本
-使用測試工具嘅成功結構，但連接真正嘅 MCP 伺服器
+真實版 MCP 股票分析工具 - 修復版本
+使用真實工具模組成功結果，並聯接真實版 MCP 服務器
 """
 import asyncio
 import os
@@ -11,7 +11,7 @@ import subprocess
 import json
 import time
 
-# MCP 連接設置
+# MCP 聯接設定
 MCP_SERVER_PATH = '/Volumes/Ketomuffin_mac/AI/mcpserver/mcp-stock-ta'
 PYTHON_INTERPRETER = os.path.join(MCP_SERVER_PATH, '.venv/bin/python')
 SERVER_SCRIPT = os.path.join(MCP_SERVER_PATH, 'server.py')
@@ -21,7 +21,7 @@ _mcp_process = None
 _process_lock = threading.Lock()
 
 def _start_mcp_server():
-    """啟動 MCP 伺服器進程"""
+    """啟動 MCP 服務器進程"""
     global _mcp_process
     
     with _process_lock:
@@ -29,9 +29,9 @@ def _start_mcp_server():
             try:
                 # 設置環境變數
                 env = os.environ.copy()
-                env['TIINGO_API_KEY'] = os.environ.get('TIINGO_API_KEY', '2146105fde5488455a958c98755941aafb9d9c66')
+                env['TIINGO_API_KEY'] = os.environ.get('TIINGO_API_KEY', '')
                 
-                # 啟動 MCP 伺服器
+                # 啟動 MCP 服務器
                 _mcp_process = subprocess.Popen(
                     [PYTHON_INTERPRETER, SERVER_SCRIPT],
                     stdin=subprocess.PIPE,
@@ -42,23 +42,23 @@ def _start_mcp_server():
                     bufsize=0
                 )
                 
-                print(f"✅ MCP 伺服器已啟動，PID: {_mcp_process.pid}")
-                time.sleep(2)  # 等待伺服器啟動
+                print(f"✅ MCP 服務器已啟動，PID: {_mcp_process.pid}")
+                time.sleep(2)  # 等待服務器啟動
                 
                 return True
                 
             except Exception as e:
-                print(f"❌ 啟動 MCP 伺服器失敗: {e}")
+                print(f"❌ 啟動 MCP 服務器失敗: {e}")
                 return False
     
     return True
 
 def _call_mcp_tool(tool_name: str, params: Dict[str, Any]) -> Dict[str, Any]:
-    """直接調用 MCP 工具"""
+    """直接使用 MCP 工具"""
     try:
-        # 確保 MCP 伺服器運行
+        # 確保 MCP 服務器運行
         if not _start_mcp_server():
-            return {"error": "無法啟動 MCP 伺服器"}
+            return {"error": "無法啟動 MCP 服務器"}
         
         # 構建 MCP 請求
         request = {
@@ -71,7 +71,7 @@ def _call_mcp_tool(tool_name: str, params: Dict[str, Any]) -> Dict[str, Any]:
             }
         }
         
-        # 發送請求到 MCP 伺服器
+        # 發送請求到 MCP 服務器
         request_json = json.dumps(request) + '\n'
         
         with _process_lock:
@@ -79,7 +79,7 @@ def _call_mcp_tool(tool_name: str, params: Dict[str, Any]) -> Dict[str, Any]:
                 _mcp_process.stdin.write(request_json)
                 _mcp_process.stdin.flush()
                 
-                # 讀取響應
+                # 獲取響應
                 response_line = _mcp_process.stdout.readline()
                 if response_line:
                     response = json.loads(response_line.strip())
@@ -91,12 +91,12 @@ def _call_mcp_tool(tool_name: str, params: Dict[str, Any]) -> Dict[str, Any]:
                     else:
                         return {"error": "未知 MCP 響應格式"}
                 else:
-                    return {"error": "MCP 伺服器無響應"}
+                    return {"error": "MCP 服務器無響應"}
             else:
-                return {"error": "MCP 伺服器進程不可用"}
+                return {"error": "MCP 服務器進程不可用"}
         
     except Exception as e:
-        return {"error": f"MCP 調用失敗: {str(e)}"}
+        return {"error": f"MCP 使用失敗: {str(e)}"}
 
 def get_stock_price(ticker: str) -> Dict[str, Any]:
     """
@@ -123,7 +123,7 @@ def get_stock_price(ticker: str) -> Dict[str, Any]:
         return {
             "error": f"獲取股價失敗: {str(e)}",
             "ticker": ticker,
-            "fallback_note": "請檢查 MCP 伺服器連接"
+            "fallback_note": "請檢查 MCP 服務器聯接"
         }
 
 def get_technical_indicators(ticker: str, indicators: str = "SMA,EMA,RSI,MACD", time_period: str = "365d") -> Dict[str, Any]:
@@ -161,12 +161,12 @@ def get_technical_indicators(ticker: str, indicators: str = "SMA,EMA,RSI,MACD", 
             "error": f"技術指標計算失敗: {str(e)}",
             "ticker": ticker,
             "indicators": indicators,
-            "fallback_note": "請檢查 MCP 伺服器連接"
+            "fallback_note": "請檢查 MCP 服務器聯接"
         }
 
 def get_momentum_analysis(ticker: str, time_period: str = "180d") -> Dict[str, Any]:
     """
-    進行股票動量分析（真正 MCP 版本）
+    執行股票動量分析（真正 MCP 版本）
     
     Args:
         ticker: 股票代碼 (例如 "AAPL", "TSLA")
@@ -176,7 +176,7 @@ def get_momentum_analysis(ticker: str, time_period: str = "180d") -> Dict[str, A
         包含動量分析結果的字典
     """
     try:
-        print(f"🔄 正在通過 MCP 進行 {ticker} 動量分析...")
+        print(f"🔄 正在通過 MCP 執行 {ticker} 動量分析...")
         
         result = _call_mcp_tool("get_momentum_stock_analysis", {
             "ticker": ticker,
@@ -194,12 +194,12 @@ def get_momentum_analysis(ticker: str, time_period: str = "180d") -> Dict[str, A
             "error": f"動量分析失敗: {str(e)}",
             "ticker": ticker,
             "time_period": time_period,
-            "fallback_note": "請檢查 MCP 伺服器連接"
+            "fallback_note": "請檢查 MCP 服務器聯接"
         }
 
 def get_volume_analysis(ticker: str, time_period: str = "365d") -> Dict[str, Any]:
     """
-    進行成交量技術分析（真正 MCP 版本）
+    執行成交量技術分析（真正 MCP 版本）
     
     Args:
         ticker: 股票代碼 (例如 "AAPL", "TSLA") 
@@ -209,7 +209,7 @@ def get_volume_analysis(ticker: str, time_period: str = "365d") -> Dict[str, Any
         包含成交量分析結果的字典
     """
     try:
-        print(f"🔄 正在通過 MCP 進行 {ticker} 成交量分析...")
+        print(f"🔄 正在通過 MCP 執行 {ticker} 成交量分析...")
         
         result = _call_mcp_tool("get_volume_technical_analysis", {
             "ticker": ticker,
@@ -227,7 +227,7 @@ def get_volume_analysis(ticker: str, time_period: str = "365d") -> Dict[str, Any
             "error": f"成交量分析失敗: {str(e)}",
             "ticker": ticker,
             "time_period": time_period,
-            "fallback_note": "請檢查 MCP 伺服器連接"
+            "fallback_note": "請檢查 MCP 服務器聯接"
         }
 
 def list_available_indicators() -> Dict[str, Any]:
@@ -251,15 +251,15 @@ def list_available_indicators() -> Dict[str, Any]:
         print(f"❌ 獲取指標列表失敗: {e}")
         return {
             "error": f"獲取指標列表失敗: {str(e)}",
-            "fallback_note": "請檢查 MCP 伺服器連接"
+            "fallback_note": "請檢查 MCP 服務器聯接"
         }
 
 def check_mcp_status() -> Dict[str, Any]:
     """
-    檢查 MCP 伺服器狀態
+    檢查 MCP 服務器狀態
     
     Returns:
-        包含 MCP 伺服器狀態信息的字典
+        包含 MCP 服務器狀態信息的字典
     """
     global _mcp_process
     
@@ -280,7 +280,7 @@ def check_mcp_status() -> Dict[str, Any]:
         status["server_script_exists"] = True
     else:
         status["server_script_exists"] = False
-        status["error"] = f"伺服器腳本不存在: {SERVER_SCRIPT}"
+        status["error"] = f"服務器腳本不存在: {SERVER_SCRIPT}"
     
     # 檢查進程狀態
     if _mcp_process:
