@@ -10,6 +10,7 @@
 - **技術指標支持** - SMA, EMA, RSI, MACD 等
 - **動能分析** - 綜合多指標評估股票動能
 - **成交量分析** - 包括 VWAP, OBV 等成交量指標
+- **Google ADK 整合** - 使用 Gemini 模型處理自然語言請求
 
 ## 安裝說明 ⚙️
 
@@ -19,10 +20,11 @@ pip install -r requirements.txt
 ```
 
 2. 設置 API 密鑰：
-   - 創建 `.streamlit/secrets.toml` 文件並添加你的 Tiingo API 密鑰：
+   - 創建 `.streamlit/secrets.toml` 文件並添加你的 API 密鑰：
    ```toml
    [api_keys]
    TIINGO_API_KEY = "你的_TIINGO_API_密鑰"
+   GOOGLE_API_KEY = "你的_GOOGLE_API_密鑰"
    ```
 
 3. 運行 Streamlit 應用：
@@ -35,8 +37,14 @@ streamlit run app.py
 1. 將代碼推送到 GitHub 存儲庫
 2. 訪問 [Streamlit Cloud](https://streamlit.io/cloud)
 3. 點擊 "New app" 並連接你的 GitHub 存儲庫
-4. 配置應用設置，包括 API 密鑰等秘密
-5. 部署應用
+4. 設置 Main file path 為 `streamlit/app.py`
+5. 配置應用設置，包括 API 密鑰等秘密：
+   ```toml
+   [api_keys]
+   TIINGO_API_KEY = "你的_TIINGO_API_密鑰"
+   GOOGLE_API_KEY = "你的_GOOGLE_API_密鑰"
+   ```
+6. 部署應用
 
 ## 使用方法 💬
 
@@ -49,22 +57,15 @@ streamlit run app.py
 
 ## 數據來源 📊
 
-股票數據來自 Tiingo API，提供高質量的金融市場數據。你需要一個 Tiingo API 密鑰來使用此應用。可以在 [Tiingo 網站](https://api.tiingo.com/) 上註冊獲取免費的 API 密鑰。
+- 股票數據來自 Tiingo API，提供高質量的金融市場數據
+- 自然語言處理由 Google Gemini 提供支持
 
-## 文件結構 📁
+## 運行模式 🔄
 
-```
-KM-stock-ta-streamlit/
-├── app.py                  # 主要 Streamlit 應用
-├── mcp_tools/              # 簡化版股票分析工具
-│   ├── __init__.py
-│   └── stock_tools.py
-├── .streamlit/             # Streamlit 配置
-│   ├── config.toml
-│   └── secrets.toml
-├── requirements.txt        # 依賴項
-└── README.md               # 本文件
-```
+應用有兩種運行模式：
+
+1. **ADK 模式** - 使用 Google ADK 和 Gemini 模型處理請求 (需要 GOOGLE_API_KEY)
+2. **簡化模式** - 使用簡單的規則和模板處理請求 (當 ADK 或 GOOGLE_API_KEY 不可用時)
 
 ## 注意事項 ⚠️
 
@@ -74,5 +75,5 @@ KM-stock-ta-streamlit/
 
 ---
 
-*版本: 1.0.0*  
+*版本: 1.0.1*  
 *最後更新: 2025-06-03*
