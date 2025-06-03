@@ -90,7 +90,11 @@ def process_user_query(query):
             result = get_stock_price(ticker)
             if "error" in result:
                 return f"獲取 {ticker} 股價時發生錯誤: {result['error']}"
-                
+
+            # 確保所有需要的鍵都存在
+            if not all(k in result for k in ["company_name", "ticker", "current_price", "open_price", "high_price", "low_price", "volume", "date"]):
+                 return f"獲取 {ticker} 股價時返回的數據格式不正確。"
+
             response = f"**{result['company_name']} ({result['ticker']})** 股票分析 📊\n\n"
             response += f"目前價格: ${result['current_price']:.2f}\n"
             response += f"今日開盤: ${result['open_price']:.2f}\n"
@@ -99,7 +103,7 @@ def process_user_query(query):
             response += f"成交量: {result['volume']:,}\n"
             response += f"日期: {result['date']}\n\n"
             response += "⚠️ 風險提醒: 投資有風險，入市需謹慎。過往表現不代表未來結果。"
-            
+
             return response
             
         elif "技術指標" in query_lower or "technical" in query_lower or "indicator" in query_lower:
@@ -138,36 +142,46 @@ def process_user_query(query):
             
             if "error" in result:
                 return f"計算 {ticker} 技術指標時發生錯誤: {result['error']}"
-                
+
+            # 確保所有需要的鍵都存在
+            if not all(k in result for k in ["company_name", "ticker", "current_price", "indicators"]):
+                 return f"計算 {ticker} 技術指標時返回的數據格式不正確。"
+
             response = f"**{result['company_name']} ({result['ticker']})** 技術指標分析 📊\n\n"
             response += f"目前價格: ${result['current_price']:.2f}\n"
             response += f"分析週期: {time_period}\n\n"
-            
+
             # 添加指標分析
             if "SMA" in result["indicators"]:
                 sma = result["indicators"]["SMA"]
-                response += f"**SMA (簡單移動平均線)** 📉\n"
-                response += f"- SMA(20): ${sma['SMA_20']}\n"
-                response += f"- SMA(50): ${sma['SMA_50']}\n"
-                response += f"- 價格相對SMA(20): {sma['Price_vs_SMA20']}\n"
-                response += f"- 均線趨勢: {sma['Trend']}\n\n"
-                
+                # 確保 SMA 相關的鍵都存在
+                if all(k in sma for k in ["SMA_20", "SMA_50", "Price_vs_SMA20", "Trend"]):
+                    response += f"**SMA (簡單移動平均線)** 📉\n"
+                    response += f"- SMA(20): ${sma['SMA_20']}\n"
+                    response += f"- SMA(50): ${sma['SMA_50']}\n"
+                    response += f"- 價格相對SMA(20): {sma['Price_vs_SMA20']}\n"
+                    response += f"- 均線趨勢: {sma['Trend']}\n\n"
+
             if "RSI" in result["indicators"]:
                 rsi = result["indicators"]["RSI"]
-                response += f"**RSI (相對強弱指標)** 📊\n"
-                response += f"- RSI(14): {rsi['RSI_14']}\n"
-                response += f"- 信號: {rsi['Signal']}\n\n"
-                
+                 # 確保 RSI 相關的鍵都存在
+                if all(k in rsi for k in ["RSI_14", "Signal"]):
+                    response += f"**RSI (相對強弱指標)** 📊\n"
+                    response += f"- RSI(14): {rsi['RSI_14']}\n"
+                    response += f"- 信號: {rsi['Signal']}\n\n"
+
             if "MACD" in result["indicators"]:
                 macd = result["indicators"]["MACD"]
-                response += f"**MACD (移動平均收斂背離指標)** 📈\n"
-                response += f"- MACD線: {macd['MACD_line']}\n"
-                response += f"- 信號線: {macd['Signal_line']}\n"
-                response += f"- 柱狀圖: {macd['Histogram']}\n"
-                response += f"- 信號: {macd['Signal']}\n\n"
-                
+                 # 確保 MACD 相關的鍵都存在
+                if all(k in macd for k in ["MACD_line", "Signal_line", "Histogram", "Signal"]):
+                    response += f"**MACD (移動平均收斂背離指標)** 📈\n"
+                    response += f"- MACD線: {macd['MACD_line']}\n"
+                    response += f"- 信號線: {macd['Signal_line']}\n"
+                    response += f"- 柱狀圖: {macd['Histogram']}\n"
+                    response += f"- 信號: {macd['Signal']}\n\n"
+
             response += "⚠️ 風險提醒: 技術分析僅供參考，投資決策應考慮多種因素。過往表現不代表未來結果。"
-            
+
             return response
             
         elif "動能" in query_lower or "動量" in query_lower or "momentum" in query_lower:
@@ -188,20 +202,25 @@ def process_user_query(query):
             
             if "error" in result:
                 return f"分析 {ticker} 動能時發生錯誤: {result['error']}"
-                
+
+            # 確保所有需要的鍵都存在
+            if not all(k in result for k in ["name", "ticker", "momentum_score", "rating", "current_price", "analysis_period", "technical_summary", "recommendation"]):
+                 return f"分析 {ticker} 動能時返回的數據格式不正確。"
+
             response = f"**{result['name']} ({result['ticker']})** 動能分析 🚀\n\n"
             response += f"動能評分: {result['momentum_score']}/100 ({result['rating']})\n"
             response += f"目前價格: ${result['current_price']:.2f}\n"
             response += f"分析週期: {result['analysis_period']}\n\n"
-            
+
             response += "**技術指標摘要**:\n"
-            for name, value in result["technical_summary"].items():
-                response += f"- {name}: {value}\n"
-            
+            if "technical_summary" in result:
+                for name, value in result["technical_summary"].items():
+                    response += f"- {name}: {value}\n"
+
             response += f"\n**建議**: {result['recommendation']}\n\n"
-            
+
             response += "⚠️ 風險提醒: 動能分析僅供參考，投資決策應考慮多種因素。過往表現不代表未來結果。"
-            
+
             return response
             
         elif "成交量" in query_lower or "volume" in query_lower:
@@ -222,21 +241,26 @@ def process_user_query(query):
             
             if "error" in result:
                 return f"分析 {ticker} 成交量時發生錯誤: {result['error']}"
-                
+
+            # 確保所有需要的鍵都存在
+            if not all(k in result for k in ["name", "ticker", "current_price", "analysis_period", "volume_indicators", "volume_trend", "vwap_analysis", "analysis"]):
+                 return f"分析 {ticker} 成交量時返回的數據格式不正確。"
+
             response = f"**{result['name']} ({result['ticker']})** 成交量分析 📊\n\n"
             response += f"目前價格: ${result['current_price']:.2f}\n"
             response += f"分析週期: {result['analysis_period']}\n\n"
-            
+
             response += "**成交量指標**:\n"
-            for name, value in result["volume_indicators"].items():
-                response += f"- {name}: {value}\n"
-            
+            if "volume_indicators" in result:
+                for name, value in result["volume_indicators"].items():
+                    response += f"- {name}: {value}\n"
+
             response += f"\n**成交量趨勢**: {result['volume_trend']}\n"
             response += f"**VWAP分析**: {result['vwap_analysis']}\n"
             response += f"**綜合分析**: {result['analysis']}\n\n"
-            
+
             response += "⚠️ 風險提醒: 成交量分析僅供參考，投資決策應考慮多種因素。過往表現不代表未來結果。"
-            
+
             return response
             
         else:
@@ -245,19 +269,24 @@ def process_user_query(query):
             
             if "error" in result:
                 return f"分析 {ticker} 時發生錯誤: {result['error']}"
-                
+
+            # 確保所有需要的鍵都存在
+            if not all(k in result for k in ["name", "ticker", "momentum_score", "rating", "current_price", "technical_summary", "recommendation"]):
+                 return f"分析 {ticker} 時返回的數據格式不正確。"
+
             response = f"**{result['name']} ({result['ticker']})** 綜合分析 📊\n\n"
             response += f"動能評分: {result['momentum_score']}/100 ({result['rating']})\n"
             response += f"目前價格: ${result['current_price']:.2f}\n\n"
-            
+
             response += "**技術指標摘要**:\n"
-            for name, value in result["technical_summary"].items():
-                response += f"- {name}: {value}\n"
-            
+            if "technical_summary" in result:
+                for name, value in result["technical_summary"].items():
+                    response += f"- {name}: {value}\n"
+
             response += f"\n**建議**: {result['recommendation']}\n\n"
-            
+
             response += "⚠️ 風險提醒: 投資有風險，入市需謹慎。過往表現不代表未來結果。"
-            
+
             return response
             
     except Exception as e:
