@@ -12,10 +12,19 @@ import re # 導入 re 模組
 import asyncio # 導入 asyncio
 
 # 導入 ADK 相關模組
-from google.adk.agents import Agent
-from google.adk.runners import Runner
-from google.adk.models.lite_llm import LiteLlm
-from google.adk.tools import Tool
+try:
+    from google.adk.agents import Agent
+    from google.adk.runners import Runner
+    from google.adk.models.lite_llm import LiteLlm
+    from google.adk.tools import Tool
+except ImportError:
+    # 嘗試其他可能的導入路徑
+    try:
+        from google.adk import Agent, Runner, Tool
+        from google.adk.models.lite_llm import LiteLlm
+    except ImportError as e:
+        st.error(f"無法導入 Google ADK 模組: {e}")
+        st.stop()
 
 # 頁面設定
 st.set_page_config(
