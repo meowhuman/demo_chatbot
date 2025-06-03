@@ -1,5 +1,5 @@
 """
-通過 subprocess 調用 MCP 工具 - 最穩定嘅方法
+通過 subprocess 使用 MCP 工具 - 最嚴格版本
 """
 import subprocess
 import json
@@ -12,21 +12,21 @@ MCP_SCRIPT_DIR = '/Volumes/Ketomuffin_mac/AI/mcpserver/mcp-stock-ta'
 
 def _run_mcp_function(function_name: str, **kwargs) -> Dict[str, Any]:
     """
-    通過 subprocess 調用 MCP 函數
+    通過 subprocess 使用 MCP 函數
     """
     try:
-        # 創建 Python 腳本
+        # 構建 Python 腳本
         script = f"""
 import sys
 sys.path.insert(0, '{MCP_SCRIPT_DIR}')
 import os
-os.environ['TIINGO_API_KEY'] = '{os.environ.get("TIINGO_API_KEY", "2146105fde5488455a958c98755941aafb9d9c66")}'
+os.environ['TIINGO_API_KEY'] = '{os.environ.get("TIINGO_API_KEY", "")}'
 import stock_ta_tool
 import json
 
 try:
     if '{function_name}' == 'get_stock_price':
-        # 模擬 get_stock_price 功能
+        # 處理 get_stock_price 功能
         df = stock_ta_tool.get_stock_data('{kwargs.get("ticker", "AAPL")}', '30d')
         if not df.empty:
             latest = df.iloc[-1]
@@ -99,7 +99,7 @@ except Exception as e:
         }
     except Exception as e:
         return {
-            "error": f"subprocess 調用失敗: {str(e)}",
+            "error": f"subprocess 使用失敗: {str(e)}",
             "function": function_name
         }
 
@@ -128,9 +128,9 @@ def get_technical_indicators(ticker: str, indicators: str = "SMA,EMA,RSI,MACD", 
     indicator_list = [ind.strip().upper() for ind in indicators.split(',')]
     
     result = _run_mcp_function("get_technical_indicators", 
-                              ticker=ticker, 
-                              indicators=indicator_list, 
-                              time_period=time_period)
+                             ticker=ticker, 
+                             indicators=indicator_list, 
+                             time_period=time_period)
     
     if "error" not in result:
         print(f"✅ 成功計算 {ticker} 技術指標")
@@ -141,13 +141,13 @@ def get_technical_indicators(ticker: str, indicators: str = "SMA,EMA,RSI,MACD", 
 
 def get_momentum_analysis(ticker: str, time_period: str = "180d") -> Dict[str, Any]:
     """
-    進行股票動量分析（subprocess 版本）
+    執行股票動量分析（subprocess 版本）
     """
-    print(f"🔄 正在通過 subprocess 進行 {ticker} 動量分析...")
+    print(f"🔄 正在通過 subprocess 執行 {ticker} 動量分析...")
     
     result = _run_mcp_function("get_momentum_analysis", 
-                              ticker=ticker, 
-                              time_period=time_period)
+                             ticker=ticker, 
+                             time_period=time_period)
     
     if "error" not in result:
         print(f"✅ 成功完成 {ticker} 動量分析")
@@ -163,17 +163,17 @@ def list_available_indicators() -> Dict[str, Any]:
     return {
         "basic_indicators": {
             "SMA": "簡單移動平均線 - 計算指定期間的平均價格",
-            "EMA": "指數移動平均線 - 對近期價格給予更多權重", 
+            "EMA": "指數移動平均線 - 對近期價格給予更高權重", 
             "RSI": "相對強弱指標 - 衡量價格變動的速度和幅度 (0-100)",
-            "MACD": "移動平均收斂背離指標 - 顯示兩條移動平均線的關係",
-            "BOLLINGER": "布林通道 - 基於移動平均線和標準差的價格通道",
-            "STOCHASTIC": "隨機指標 - 比較收盤價與價格範圍的關係",
-            "WILLIAMS_R": "威廉指標 - 衡量超買超賣的動量振盪器",
-            "ADX": "平均趨向指標 - 衡量趨勢強度",
+            "MACD": "移動平均匯聚背馳指標 - 揭示主要移動平均線的差異",
+            "BOLLINGER": "布林帶區間 - 基於移動平均線和標準差的價格區間",
+            "STOCHASTIC": "隨機指標 - 比較收盤價與價格範圍的關系",
+            "WILLIAMS_R": "威廉指標 - 衡量超買超賣的動量徵兆",
+            "ADX": "平均趨向指標 - 衡量價格趨勢強度",
             "ATR": "平均真實範圍 - 衡量價格波動性",
-            "CCI": "商品通道指標 - 識別周期性趨勢的動量指標"
+            "CCI": "商品通道指標 - 測量週期性價格偏離的動量指標"
         },
-        "data_source": "Tiingo API（通過 subprocess 調用）",
+        "data_source": "Tiingo API（通過 subprocess 使用）",
         "method": "subprocess",
         "status": "可用"
     }
@@ -183,7 +183,7 @@ def check_mcp_status() -> Dict[str, Any]:
     檢查 MCP subprocess 狀態
     """
     try:
-        # 測試基本調用
+        # 試驗性實際使用
         test_result = _run_mcp_function("get_stock_price", ticker="AAPL")
         
         return {
