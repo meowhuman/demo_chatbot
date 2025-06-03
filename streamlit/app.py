@@ -82,6 +82,11 @@ def init_adk():
             return None
             
         print("✅ OPENROUTER_API_KEY 環境變數已設置。")
+        
+        # 打印所有環境變數以供調試
+        print("ℹ️ 當前環境變數:")
+        for key, value in os.environ.items():
+            print(f"    {key}={value}")
 
         # 初始化 LiteLlm 模型
         print("ℹ️ 正在初始化 LiteLlm 模型...")
