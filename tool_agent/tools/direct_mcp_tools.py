@@ -1,42 +1,42 @@
 """
-直接 MCP 工具整合 - 含診斷功能
+直接 MCP 工具整合 - 含依賴功能
 """
 import sys
 import os
 from typing import Dict, Any
 from .mcp_diagnosis import diagnose_mcp_import, get_stock_price_fallback, get_technical_indicators_fallback, get_momentum_analysis_fallback
 
-# 添加 MCP 伺服器路徑到 Python path
+# 添加 MCP 服務器路徑到 Python path
 MCP_SERVER_PATH = '/Volumes/Ketomuffin_mac/AI/mcpserver/mcp-stock-ta'
 if MCP_SERVER_PATH not in sys.path:
     sys.path.insert(0, MCP_SERVER_PATH)
 
 # 設置環境變數
-os.environ['TIINGO_API_KEY'] = os.environ.get('TIINGO_API_KEY', '2146105fde5488455a958c98755941aafb9d9c66')
+os.environ['TIINGO_API_KEY'] = os.environ.get('TIINGO_API_KEY', '')
 
-# 進行診斷並嘗試導入
-print("🔍 正在診斷 MCP 模組...")
+# 執行依賴檢查及列表導入
+print("🔍 正在檢查 MCP 模組...")
 diagnosis = diagnose_mcp_import()
 
-# 嘗試直接 import MCP 工具模組
+# 列表直接 import MCP 工具模組
 try:
     import stock_ta_tool
     print("✅ 成功導入 stock_ta_tool 模組")
     MCP_AVAILABLE = True
 except ImportError as e:
     print(f"❌ 無法導入 stock_ta_tool: {e}")
-    print("📋 診斷結果:")
+    print("🔋 檢查結果:")
     for key, value in diagnosis.items():
         if key != "recommendations":
             print(f"  {key}: {value}")
-    print("💡 建議:")
+    print("🔡 建議:")
     for rec in diagnosis["recommendations"]:
         print(f"  - {rec}")
     MCP_AVAILABLE = False
 
 def get_stock_price(ticker: str) -> Dict[str, Any]:
     """
-    獲取股票當前價格和基本信息（帶診斷版本）
+    獲取股票當前價格和基本信息（並依賴版本）
     """
     if not MCP_AVAILABLE:
         return get_stock_price_fallback(ticker)
@@ -44,9 +44,9 @@ def get_stock_price(ticker: str) -> Dict[str, Any]:
     try:
         print(f"🔄 正在獲取 {ticker} 股價...")
         
-        # 直接調用 MCP 工具函數
+        # 直接使用 MCP 工具函數
         # 使用正確的函數名稱（從 server.py 可以看到是 get_stock_price）
-        df = stock_ta_tool.get_stock_data(ticker, time_period="30d")  # 使用較短時間範圍
+        df = stock_ta_tool.get_stock_data(ticker, time_period="30d")  # 使用較短時期減輕
         
         if df.empty:
             return {
@@ -92,7 +92,7 @@ def get_stock_price(ticker: str) -> Dict[str, Any]:
 
 def get_technical_indicators(ticker: str, indicators: str = "SMA,EMA,RSI,MACD", time_period: str = "365d") -> Dict[str, Any]:
     """
-    計算股票技術指標（帶診斷版本）
+    計算股票技術指標（並依賴版本）
     """
     if not MCP_AVAILABLE:
         return get_technical_indicators_fallback(ticker, indicators, time_period)
@@ -103,7 +103,7 @@ def get_technical_indicators(ticker: str, indicators: str = "SMA,EMA,RSI,MACD", 
         # 轉換指標字符串為列表
         indicator_list = [ind.strip().upper() for ind in indicators.split(',')]
         
-        # 直接調用 MCP 工具函數
+        # 直接使用 MCP 工具函數
         result = stock_ta_tool.get_technical_indicators(
             ticker=ticker,
             indicators=indicator_list,
@@ -125,15 +125,15 @@ def get_technical_indicators(ticker: str, indicators: str = "SMA,EMA,RSI,MACD", 
 
 def get_momentum_analysis(ticker: str, time_period: str = "180d") -> Dict[str, Any]:
     """
-    進行股票動量分析（帶診斷版本）
+    執行股票動量分析（並依賴版本）
     """
     if not MCP_AVAILABLE:
         return get_momentum_analysis_fallback(ticker, time_period)
     
     try:
-        print(f"🔄 正在進行 {ticker} 動量分析...")
+        print(f"🔄 正在執行 {ticker} 動量分析...")
         
-        # 直接調用 MCP 工具函數
+        # 直接使用 MCP 工具函數
         result = stock_ta_tool.momentum_stock_score(
             ticker=ticker,
             time_period=time_period
@@ -159,15 +159,15 @@ def list_available_indicators() -> Dict[str, Any]:
     return {
         "basic_indicators": {
             "SMA": "簡單移動平均線 - 計算指定期間的平均價格",
-            "EMA": "指數移動平均線 - 對近期價格給予更多權重",
+            "EMA": "指數移動平均線 - 對近期價格給予更高權重",
             "RSI": "相對強弱指標 - 衡量價格變動的速度和幅度 (0-100)",
-            "MACD": "移動平均收斂背離指標 - 顯示兩條移動平均線的關係",
-            "BOLLINGER": "布林通道 - 基於移動平均線和標準差的價格通道",
-            "STOCHASTIC": "隨機指標 - 比較收盤價與價格範圍的關係",
-            "WILLIAMS_R": "威廉指標 - 衡量超買超賣的動量振盪器",
-            "ADX": "平均趨向指標 - 衡量趨勢強度 (不包括方向)",
+            "MACD": "移動平均匯聚背馳指標 - 揭示主要移動平均線的差異",
+            "BOLLINGER": "布林帶區間 - 基於移動平均線和標準差的價格區間",
+            "STOCHASTIC": "隨機指標 - 比較收盤價與價格範圍的關系",
+            "WILLIAMS_R": "威廉指標 - 衡量超買超賣的動量徵兆",
+            "ADX": "平均趨向指標 - 衡量價格趨勢強度 (不包括方向)",
             "ATR": "平均真實範圍 - 衡量價格波動性",
-            "CCI": "商品通道指標 - 識別周期性趨勢的動量指標"
+            "CCI": "商品通道指標 - 測量週期性價格偏離的動量指標"
         },
         "usage_examples": {
             "basic_analysis": "get_technical_indicators('AAPL', 'SMA,EMA,RSI,MACD')",
@@ -180,7 +180,7 @@ def list_available_indicators() -> Dict[str, Any]:
 
 def check_mcp_status() -> Dict[str, Any]:
     """
-    檢查 MCP 模組狀態（詳細診斷版本）
+    檢查 MCP 模組狀態（實時依賴版本）
     """
     return {
         "mcp_available": MCP_AVAILABLE,
