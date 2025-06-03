@@ -69,12 +69,25 @@ except ImportError:
 @st.cache_resource
 def init_adk():
     """初始化 ADK 代理和 Runner"""
+    print("ℹ️ 正在初始化 ADK 代理和 Runner...")
     try:
+        # 檢查 OPENROUTER_API_KEY 是否存在
+        openrouter_api_key = os.environ.get("OPENROUTER_API_KEY")
+        if not openrouter_api_key:
+            print("⚠️ OPENROUTER_API_KEY 環境變數未設置。")
+            # 這裡可以選擇拋出異常或返回 None，暫時返回 None
+            st.error("OPENROUTER_API_KEY 環境變數未設置，無法初始化 ADK。")
+            return None
+            
+        print("✅ OPENROUTER_API_KEY 環境變數已設置。")
+
         # 初始化 LiteLlm 模型
-        # 使用 OPENROUTER_API_KEY，並指定模型名稱
-        llm = LiteLlm(model="google/gemini-pro", api_key=os.environ.get("OPENROUTER_API_KEY"))
+        print("ℹ️ 正在初始化 LiteLlm 模型...")
+        llm = LiteLlm(model="google/gemini-pro", api_key=openrouter_api_key)
+        print("✅ LiteLlm 模型初始化成功。")
 
         # 將現有工具包裝成 ADK Tool 實例
+        print("ℹ️ 正在包裝股票分析工具...")
         tools = [
             Tool(
                 name="get_stock_price",
