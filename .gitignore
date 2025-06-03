@@ -30,6 +30,8 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+# 特定項目環境變數
+tool_agent/.env
 
 # macOS
 .DS_Store
