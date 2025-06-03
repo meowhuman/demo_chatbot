@@ -155,16 +155,28 @@ runner = init_adk()
 def process_user_query(query):
     """處理用戶查詢並生成回應"""
     if runner is None:
+        print("❌ ADK 代理未初始化，無法處理請求。")
         return "ADK 代理初始化失敗，無法處理請求。"
 
     try:
         # 使用 asyncio.run() 運行異步的 runner.run()
+        # 添加更詳細的錯誤處理
+        print(f"ℹ️ 正在處理查詢: {query}")
         response = asyncio.run(runner.run(query))
+        print(f"✅ 查詢處理完成，收到回應。")
         
         # runner.run() 返回的是一個 Response 對象，提取其中的文本內容
-        return response.text
+        if hasattr(response, 'text'):
+            return response.text
+        else:
+            print(f"⚠️ Runner 返回的對象沒有 'text' 屬性: {response}")
+            return f"收到無效的回應格式: {response}"
         
     except Exception as e:
+        print(f"❌ 處理請求時發生錯誤: {str(e)}")
+        # 打印更詳細的錯誤信息，包括 traceback
+        import traceback
+        traceback.print_exc()
         return f"處理請求時發生錯誤: {str(e)}"
 
 # 生成模擬的回應流
