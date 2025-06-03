@@ -45,9 +45,43 @@ Or visit the deployed version at: [https://demochatbot-ta.streamlit.app/](https:
 
 The Streamlit app can be deployed directly from this repository. Just point Streamlit Cloud to the `streamlit/app.py` file.
 
-## API Key
+## 關於安全性的說明
 
-This project uses Tiingo API for stock data. You'll need to configure your API key in the Streamlit secrets.
+### API 密鑰處理
+
+為了確保 API 密鑰的安全，請遵循以下步驟：
+
+1. 永遠不要在代碼中直接硬編碼 API 密鑰
+2. 使用 `.env` 文件存儲環境變數（參考 `.env.example` 文件）
+3. 確保 `.env` 文件已添加到 `.gitignore` 中，避免提交到版本控制系統
+4. 使用環境變數載入 API 密鑰：`os.environ.get('API_KEY_NAME')`
+
+### 設置說明
+
+1. 複製 `.env.example` 文件為 `.env`：
+```bash
+cp tool_agent/.env.example tool_agent/.env
+```
+
+2. 編輯 `.env` 文件，添加您的 API 密鑰：
+```
+GOOGLE_GENAI_USE_VERTEXAI=FALSE
+GOOGLE_API_KEY=your_google_api_key_here
+TIINGO_API_KEY=your_tiingo_api_key_here
+```
+
+3. 確保 `.env` 不會被提交到 Git：
+```bash
+echo "tool_agent/.env" >> .gitignore
+```
+
+### 安全檢查
+
+在提交代碼前，請執行以下安全檢查：
+
+1. 確認沒有硬編碼的密鑰或敏感資訊
+2. 確認 `.env` 文件不會被提交
+3. 考慮使用工具如 GitGuardian 來監控潛在的密鑰洩露
 
 ## License
 
