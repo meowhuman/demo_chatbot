@@ -54,7 +54,9 @@ def process_user_query(query):
         # 提取股票代碼 (簡單版本)
         ticker = None
         for word in query_lower.split():
-            if word.isalpha() and word.isupper() or word.isalnum() and len(word) <= 5:
+            # 更嚴格地匹配股票代碼格式 (全大寫字母或包含字母數字且長度 <= 5)
+            if (word.isalpha() and word.isupper() and len(word) <= 5) or \
+               (word.isalnum() and len(word) <= 5 and any(c.isalpha() for c in word)):
                 ticker = word.upper()
                 break
                 
