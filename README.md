@@ -1,97 +1,54 @@
-# KM Tool Agent Test - Stock Technical Analysis 📈
+# KM Stock Technical Analysis Agent
 
-呢個係一個整合咗股票技術分析 MCP 工具嘅 ADK agent。佢提供全面嘅股票分析功能，包括技術指標、動能分析、回測同策略優化。
+This repository contains a Stock Technical Analysis Agent built with Google ADK and a Streamlit web frontend for easy interaction.
 
-## 功能特色 🚀
+## Repository Structure
 
-### 📊 技術指標分析
-- **移動平均線**: SMA, EMA
-- **動能指標**: RSI, MACD, ADX, ATR
-- **波幅指標**: 布林帶, CCI
-- **趨勢指標**: 隨機指標, Williams %R
+- `/tool_agent/`: Contains the ADK agent for stock technical analysis
+- `/scripts/`: Helper scripts for the agent
+- `/streamlit/`: Streamlit web application for interacting with the agent
 
-### 🎯 動能分析
-- 綜合動能評分 (0-100)
-- 多重技術指標確認
-- 突破點識別
-- 過度買賣保護
+## Stock Technical Analysis Agent
 
-### 📈 回測功能
-- MA Crossover 策略
-- RSI 策略
-- MACD 策略  
-- Bollinger Bands 策略
+The agent provides comprehensive stock analysis capabilities:
 
-### 🔍 策略優化
-- 參數優化
-- 績效評估
-- 風險分析
+- Technical indicators (SMA, EMA, RSI, MACD, etc.)
+- Momentum analysis with scoring
+- Volume analysis
+- Stock price information
 
-### 🔎 數據品質檢查
-- 數據完整性檢查
-- 準確性驗證
+## Streamlit Web App
 
-## 架構設計 🏗️
+The Streamlit application provides a chat interface to interact with the stock analysis capabilities:
 
-呢個 agent 使用咗 **MCP (Model Context Protocol)** 嚟連接外部嘅股票技術分析工具：
+### Features
 
-```
-KM-tool-agent-test/
-├── tool_agent/
-│   ├── __init__.py          # Package 初始化
-│   ├── agent.py             # 主要 agent 邏輯 (MCP 連接)
-│   ├── .env                 # API 密鑰配置
-│   └── tools/               # 空目錄 (用緊 MCP 工具)
-│       └── __init__.py
-└── README.md                # 呢個檔案
+- Interactive chat interface
+- Quick selection sidebar for common stocks and analysis types
+- Real-time stock data analysis
+- Technical indicators support
+- Momentum analysis with scoring
+- Volume analysis
+
+### Usage
+
+To run the Streamlit app locally:
+
+```bash
+cd streamlit
+./run_local.sh
 ```
 
-## MCP 工具連接 🔗
+Or visit the deployed version at: [https://demochatbot-ta.streamlit.app/](https://demochatbot-ta.streamlit.app/)
 
-Agent 連接到位於 `/Volumes/Ketomuffin_mac/AI/mcpserver/mcp-stock-ta` 嘅 MCP 伺服器，提供以下工具：
+## Deployment
 
-- `get_technical_indicators`: 計算技術指標
-- `get_momentum_stock_analysis`: 動能分析
-- `run_simple_backtest`: 簡單回測
-- `advanced_strategy_optimization_fixed`: 策略優化
-- `get_data_quality_report`: 數據品質檢查
+The Streamlit app can be deployed directly from this repository. Just point Streamlit Cloud to the `streamlit/app.py` file.
 
-## 環境配置 ⚙️
+## API Key
 
-確保你嘅 `.env` 檔案包含以下 API 密鑰：
+This project uses Tiingo API for stock data. You'll need to configure your API key in the Streamlit secrets.
 
-```env
-GOOGLE_API_KEY=your_google_api_key_here
-TIINGO_API_KEY=your_tiingo_api_key_here
-```
+## License
 
-## 使用方法 💡
-
-```python
-from tool_agent import root_agent
-
-# Agent 會自動連接到 MCP 伺服器並載入工具
-# 你可以詢問股票分析相關問題，例如：
-# - "分析 AAPL 嘅技術指標"
-# - "Tesla 嘅動能評分係幾多？"
-# - "用 MA crossover 策略回測 NVDA"
-```
-
-## 特點 ✨
-
-- **🔄 自動重試機制**: 連接失敗時會自動重試
-- **📝 繁體中文支援**: 所有分析結果都用繁體中文呈現
-- **⚠️ 風險警告**: 自動包含投資風險提醒
-- **🎯 智能分析**: 提供清晰易明嘅技術指標解釋
-
-## 依賴項目 🛠️
-
-- Google ADK
-- MCP (Model Context Protocol)
-- Python 3.10+
-- Tiingo API (用於股票數據)
-
----
-
-*建立日期: 2025-06-02*  
-*基於: /Volumes/Ketomuffin_mac/AI2/agents-mcp-test/stock_ta 參考*
+MIT License
