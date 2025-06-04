@@ -72,8 +72,6 @@ except ImportError:
 def init_adk():
     """初始化 ADK 代理和 Runner"""
     print("ℹ️ 正在初始化 ADK 代理和 Runner...")
-    """初始化 ADK 代理和 Runner"""
-    print("ℹ️ 正在初始化 ADK 代理和 Runner...")
     try:
         # 檢查 GOOGLE_API_KEY 是否存在
         google_api_key = os.environ.get("GOOGLE_API_KEY")
