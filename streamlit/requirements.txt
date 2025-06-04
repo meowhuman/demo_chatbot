@@ -7,4 +7,4 @@ requests==2.31.0
 google-adk
 litellm
 yfinance>=0.2.18
-google-generativeai
+google-generativeai # 添加註釋以觸發重新安裝
