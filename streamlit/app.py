@@ -14,22 +14,20 @@ import google.generativeai as genai  # 全局導入 genai 模組
 
 # 導入 ADK 相關模組
 try:
-    from google.adk.agents import Agent
-    from google.adk.runners import Runner
-    from google.adk.models.lite_llm import LiteLlm
-    from google.adk.tools import Tool
-except ImportError:
-    # 嘗試其他可能的導入路徑
+    # 嘗試從頂層導入所有公開名稱
+    from google.adk import *
+    print("✅ 成功導入 Google ADK 所有公開模組。")
+except ImportError as e:
+    st.error(f"無法導入 Google ADK 模組: {e}")
+    print(f"❌ 導入 Google ADK 失敗: {e}")
+    print("ℹ️ sys.path:", sys.path)
+    # 嘗試打印 google.adk 模組的內容 (如果已部分導入)
     try:
-        from google.adk import Agent, Runner
-        from google.adk.models.lite_llm import LiteLlm
-        # 移除從 google.adk 頂層導入 Tool 的嘗試
-        # from google.adk import Tool
-        # 在備用導入中也嘗試從 google.adk.tools 導入 Tool
-        from google.adk.tools import Tool
-    except ImportError as e:
-        st.error(f"無法導入 Google ADK 模組: {e}")
-        st.stop()
+        import google.adk
+        print("ℹ️ google.adk 模組內容:", dir(google.adk))
+    except ImportError:
+        print("ℹ️ 無法導入 google.adk 模組。")
+    st.stop()
 
 # 頁面設定
 st.set_page_config(
