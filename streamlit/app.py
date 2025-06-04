@@ -14,9 +14,10 @@ import google.generativeai as genai  # 全局導入 genai 模組
 
 # 導入 ADK 相關模組
 try:
-    # 嘗試從頂層導入所有公開名稱
-    from google.adk import *
-    print("✅ 成功導入 Google ADK 所有公開模組。")
+    # 嘗試從 google.adk.agents 導入 Agent, Runner, Tool
+    from google.adk.agents import Agent, Runner, Tool
+    from google.adk.models.lite_llm import LiteLlm
+    print("✅ 成功導入 Google ADK 模組。")
 except ImportError as e:
     st.error(f"無法導入 Google ADK 模組: {e}")
     print(f"❌ 導入 Google ADK 失敗: {e}")
