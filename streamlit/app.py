@@ -25,6 +25,8 @@ except ImportError:
         from google.adk.models.lite_llm import LiteLlm
         # 移除從 google.adk 頂層導入 Tool 的嘗試
         # from google.adk import Tool
+        # 在備用導入中也嘗試從 google.adk.tools 導入 Tool
+        from google.adk.tools import Tool
     except ImportError as e:
         st.error(f"無法導入 Google ADK 模組: {e}")
         st.stop()
