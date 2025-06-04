@@ -10,6 +10,7 @@ import numpy as np
 from datetime import datetime, timedelta
 import re # 導入 re 模組
 import asyncio # 導入 asyncio
+import google.generativeai as genai  # 全局導入 genai 模組
 
 # 導入 ADK 相關模組
 try:
@@ -87,10 +88,8 @@ def init_adk():
         for key, value in os.environ.items():
             print(f"    {key}={value}")
 
-        # 初始化 Google Gemini 模型
+        # 初始化 Google Gemini 模型 (使用全局導入的 genai)
         print("ℹ️ 正在初始化 Google Gemini 模型...")
-        genai.configure(api_key=google_api_key)
-        # 使用 genai.GenerativeModel 初始化模型
         llm = genai.GenerativeModel(model_name="gemini-pro")
         print("✅ Google Gemini 模型初始化成功。")
 
